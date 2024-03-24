@@ -1,5 +1,6 @@
 const express = require('express');
 const handlebars = require('express-handlebars');
+const methodOverride = require('method-override');
 const session = require('express-session');
 const passport = require('./config/passport');
 const flash = require('connect-flash');
@@ -17,6 +18,7 @@ app.engine('hbs', handlebars({ extname: '.hbs', helpers: handlebarsHelpers }));
 app.set('view engine', 'hbs');
 
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 app.use(
   session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false })
 );
