@@ -5,8 +5,9 @@ const passport = require('../config/passport');
 const admin = require('./modules/admin');
 const restaurantController = require('../controllers/restaurant-controller');
 const userController = require('../controllers/user-controller');
+const authHandler = require('../middlewares/auth-handler')
 
-router.use('/admin', admin);
+router.use('/admin', authHandler.authenticatedAdmin, admin);
 
 router.get('/signup', userController.signUpPage);
 router.post('/signup', userController.signUp);
@@ -21,7 +22,7 @@ router.post(
 );
 router.get('/logout', userController.logout);
 
-router.get('/restaurants', restaurantController.getRestaurants);
+router.get('/restaurants', authHandler.authenticated, restaurantController.getRestaurants);
 
 router.use('/', (req, res) => res.redirect('/restaurants'));
 
