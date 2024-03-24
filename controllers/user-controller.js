@@ -25,6 +25,20 @@ const userController = {
       next(error);
     }
   },
+  signInPage: (req, res) => {
+    return res.render('signin');
+  },
+  signIn: (req, res) => {
+    req.flash('success_message', 'Successfully sign in.');
+    return res.redirect('/restaurants');
+  },
+  logout: (req, res, next) => {
+    req.flash('success_message', 'Successfully log out.');
+    req.logout((err) => {
+      if (err) return next(err);
+    });
+    return res.redirect('/signin');
+  },
 };
 
 module.exports = userController;
