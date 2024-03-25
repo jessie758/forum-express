@@ -1,4 +1,5 @@
 const { Restaurant } = require('../models');
+const { localFileHandler } = require('../helpers/file-helpers');
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
@@ -31,12 +32,16 @@ const adminController = {
 
       if (!name) throw new Error('Restaurant name is required.');
 
+      const file = req.file; // multer 處理過的圖片會存放在 req.file
+      const filePath = await localFileHandler(file);
+
       await Restaurant.create({
         name,
         tel,
         openingHours,
         address,
         description,
+        image: filePath || null,
       });
 
       req.flash('success_message', 'Restaurant was successfully created.');
@@ -64,7 +69,12 @@ const adminController = {
 
       if (!name) throw new Error('Restaurant name is required.');
 
-      const restaurant = await Restaurant.findByPk(id);
+      const file = req.file;
+      const [filePath, restaurant] = await Promise.all([
+        localFileHandler(file),
+        Restaurant.findByPk(id),
+      ]);
+
       if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
 
       await restaurant.update({
@@ -73,6 +83,7 @@ const adminController = {
         openingHours,
         address,
         description,
+        image: filePath || restaurant.image,
       });
 
       req.flash('success_message', 'Restaurant was successfully updated.');

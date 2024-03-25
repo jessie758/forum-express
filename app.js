@@ -1,3 +1,5 @@
+const path = require('path');
+
 const express = require('express');
 const handlebars = require('express-handlebars');
 const methodOverride = require('method-override');
@@ -17,6 +19,7 @@ const SESSION_SECRET = 'secret';
 app.engine('hbs', handlebars({ extname: '.hbs', helpers: handlebarsHelpers }));
 app.set('view engine', 'hbs');
 
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(
