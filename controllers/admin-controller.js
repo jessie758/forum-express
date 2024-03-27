@@ -44,7 +44,7 @@ const adminController = {
         image: filePath || null,
       });
 
-      req.flash('success_message', 'Restaurant was successfully created.');
+      req.flash('success_messages', 'Restaurant was successfully created.');
       return res.redirect('/admin/restaurants');
     } catch (error) {
       return next(error);
@@ -86,7 +86,7 @@ const adminController = {
         image: filePath || restaurant.image,
       });
 
-      req.flash('success_message', 'Restaurant was successfully updated.');
+      req.flash('success_messages', 'Restaurant was successfully updated.');
       return res.redirect('/admin/restaurants');
     } catch (error) {
       return next(error);
@@ -101,7 +101,7 @@ const adminController = {
 
       await restaurant.destroy();
 
-      req.flash('success_message', 'Restaurant was successfully deleted.');
+      req.flash('success_messages', 'Restaurant was successfully deleted.');
       return res.redirect('/admin/restaurants');
     } catch (error) {
       return next(error);
