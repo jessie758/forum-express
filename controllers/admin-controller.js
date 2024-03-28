@@ -1,12 +1,13 @@
-const { Restaurant } = require('../models');
+const { Restaurant, User } = require('../models');
 const { localFileHandler } = require('../helpers/file-helpers');
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
     try {
       const restaurants = await Restaurant.findAll({ raw: true });
+      const tab = 'restaurants';
 
-      return res.render('admin/restaurants', { restaurants });
+      return res.render('admin/restaurants', { restaurants, tab });
     } catch (error) {
       return next(error);
     }
@@ -103,6 +104,40 @@ const adminController = {
 
       req.flash('success_messages', 'Restaurant was successfully deleted.');
       return res.redirect('/admin/restaurants');
+    } catch (error) {
+      return next(error);
+    }
+  },
+  getUsers: async (req, res, next) => {
+    try {
+      const users = await User.findAll({
+        attributes: ['id', 'name', 'email', 'is_admin'],
+        raw: true,
+      });
+      const tab = 'users';
+
+      return res.render('admin/users', { users, tab });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  patchUser: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+
+      const user = await User.findByPk(id);
+
+      if (!user) throw new Error(`User doesn't exist.`);
+
+      if (user.email === 'root@example.com') {
+        req.flash('error_messages', '禁止變更 root 權限');
+        return res.redirect('back');
+      }
+
+      await user.update({ isAdmin: !user.isAdmin });
+
+      req.flash('success_messages', `使用者權限變更成功`);
+      return res.redirect('/admin/users');
     } catch (error) {
       return next(error);
     }
