@@ -19,7 +19,7 @@ const userController = {
       const hash = await bcrypt.hash(password, 10);
       await User.create({ name, email, password: hash });
 
-      req.flash('success_message', 'Successfully sign up.');
+      req.flash('success_messages', 'Successfully sign up.');
       return res.redirect('/signin');
     } catch (error) {
       next(error);
@@ -29,11 +29,11 @@ const userController = {
     return res.render('signin');
   },
   signIn: (req, res) => {
-    req.flash('success_message', 'Successfully sign in.');
+    req.flash('success_messages', 'Successfully sign in.');
     return res.redirect('/restaurants');
   },
   logout: (req, res, next) => {
-    req.flash('success_message', 'Successfully log out.');
+    req.flash('success_messages', 'Successfully log out.');
     req.logout((err) => {
       if (err) return next(err);
     });

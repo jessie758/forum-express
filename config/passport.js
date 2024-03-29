@@ -22,7 +22,7 @@ passport.use(
           return done(
             null,
             false,
-            req.flash('error_message', 'Email or password is incorrect.')
+            req.flash('error_messages', 'Email or password is incorrect.')
           );
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -30,7 +30,7 @@ passport.use(
           return done(
             null,
             false,
-            req.flash('error_message', 'Email or password is incorrect.')
+            req.flash('error_messages', 'Email or password is incorrect.')
           );
 
         return done(null, user);

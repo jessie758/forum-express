@@ -11,6 +11,8 @@ router.get('/restaurants/:id', adminController.getRestaurant);
 
 router.get('/restaurants', adminController.getRestaurants);
 
+router.get('/users', adminController.getUsers);
+
 // 若 multer 遇到 request 裡有圖片檔案
 // 就會自動把檔案複製到 temp 資料夾
 
@@ -25,6 +27,8 @@ router.put(
   upload.single('image'),
   adminController.putRestaurant
 );
+
+router.patch('/users/:id', adminController.patchUser);
 
 router.delete('/restaurants/:id', adminController.deleteRestaurant);
 
