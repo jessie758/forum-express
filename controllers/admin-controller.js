@@ -9,9 +9,8 @@ const adminController = {
         raw: true,
         nest: true,
       });
-      const tab = 'restaurants';
 
-      return res.render('admin/restaurants', { restaurants, tab });
+      return res.render('admin/restaurants', { restaurants });
     } catch (error) {
       return next(error);
     }
@@ -135,9 +134,8 @@ const adminController = {
         attributes: ['id', 'name', 'email', 'is_admin'],
         raw: true,
       });
-      const tab = 'users';
 
-      return res.render('admin/users', { users, tab });
+      return res.render('admin/users', { users });
     } catch (error) {
       return next(error);
     }
