@@ -1,10 +1,14 @@
-const { Restaurant, User } = require('../models');
+const { Restaurant, User, Category } = require('../models');
 const { localFileHandler } = require('../helpers/file-helpers');
 
 const adminController = {
   getRestaurants: async (req, res, next) => {
     try {
-      const restaurants = await Restaurant.findAll({ raw: true });
+      const restaurants = await Restaurant.findAll({
+        include: [Category],
+        raw: true,
+        nest: true,
+      });
       const tab = 'restaurants';
 
       return res.render('admin/restaurants', { restaurants, tab });
@@ -16,7 +20,11 @@ const adminController = {
     try {
       const id = req.params.id;
 
-      const restaurant = await Restaurant.findByPk(id, { raw: true });
+      const restaurant = await Restaurant.findByPk(id, {
+        include: [Category],
+        raw: true,
+        nest: true,
+      });
       if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
 
       return res.render('admin/restaurant', { restaurant });
@@ -24,12 +32,19 @@ const adminController = {
       return next(error);
     }
   },
-  createRestaurant: (req, res) => {
-    return res.render('admin/create-restaurant');
+  createRestaurant: async (req, res) => {
+    try {
+      const categories = await Category.findAll({ raw: true });
+
+      return res.render('admin/create-restaurant', { categories });
+    } catch (error) {
+      return next(error);
+    }
   },
   postRestaurant: async (req, res, next) => {
     try {
-      const { name, tel, openingHours, address, description } = req.body;
+      const { name, tel, openingHours, address, description, categoryId } =
+        req.body;
 
       if (!name) throw new Error('Restaurant name is required.');
 
@@ -43,6 +58,7 @@ const adminController = {
         address,
         description,
         image: filePath || null,
+        categoryId,
       });
 
       req.flash('success_messages', 'Restaurant was successfully created.');
@@ -55,10 +71,13 @@ const adminController = {
     try {
       const id = req.params.id;
 
-      const restaurant = await Restaurant.findByPk(id, { raw: true });
+      const [restaurant, categories] = await Promise.all([
+        Restaurant.findByPk(id, { raw: true }),
+        Category.findAll({ raw: true }),
+      ]);
       if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
 
-      return res.render('admin/edit-restaurant', { restaurant });
+      return res.render('admin/edit-restaurant', { restaurant, categories });
     } catch (error) {
       return next(error);
     }
@@ -66,7 +85,8 @@ const adminController = {
   putRestaurant: async (req, res, next) => {
     try {
       const id = req.params.id;
-      const { name, tel, openingHours, address, description } = req.body;
+      const { name, tel, openingHours, address, description, categoryId } =
+        req.body;
 
       if (!name) throw new Error('Restaurant name is required.');
 
@@ -85,6 +105,7 @@ const adminController = {
         address,
         description,
         image: filePath || restaurant.image,
+        categoryId,
       });
 
       req.flash('success_messages', 'Restaurant was successfully updated.');
