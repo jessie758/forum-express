@@ -4,6 +4,7 @@ const passport = require('../config/passport');
 
 const admin = require('./modules/admin');
 const restaurantController = require('../controllers/restaurant-controller');
+const commentController = require('../controllers/comment-controller');
 const userController = require('../controllers/user-controller');
 const authHandler = require('../middlewares/auth-handler');
 
@@ -18,6 +19,17 @@ router.get(
   '/restaurants',
   authHandler.authenticated,
   restaurantController.getRestaurants
+);
+
+router.post(
+  '/comments',
+  authHandler.authenticated,
+  commentController.postComment
+);
+router.delete(
+  '/comments/:id',
+  authHandler.authenticatedAdmin,
+  commentController.deleteComment
 );
 
 router.get('/signup', userController.signUpPage);
