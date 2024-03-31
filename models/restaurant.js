@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       address: DataTypes.STRING,
       description: DataTypes.TEXT,
       image: DataTypes.STRING,
+      viewCounts: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       categoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
