@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require('../config/passport');
 
 const admin = require('./modules/admin');
-const restaurantController = require('../controllers/restaurant-controller');
+const restController = require('../controllers/restaurant-controller');
 const commentController = require('../controllers/comment-controller');
 const userController = require('../controllers/user-controller');
 const authHandler = require('../middlewares/auth-handler');
@@ -13,12 +13,12 @@ router.use('/admin', authHandler.authenticatedAdmin, admin);
 router.get(
   '/restaurants/:id',
   authHandler.authenticated,
-  restaurantController.getRestaurant
+  restController.getRestaurant
 );
 router.get(
   '/restaurants',
   authHandler.authenticated,
-  restaurantController.getRestaurants
+  restController.getRestaurants
 );
 
 router.post(

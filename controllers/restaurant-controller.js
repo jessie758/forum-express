@@ -1,7 +1,7 @@
 const { Restaurant, Category, Comment, User } = require('../models');
 const { getOffset, getPagination } = require('../helpers/pagination-helper');
 
-const restaurantController = {
+const restController = {
   getRestaurants: async (req, res, next) => {
     const DEFAULT_LIMIT = 9;
     const page = Number(req.query.page) || 1;
@@ -57,4 +57,4 @@ const restaurantController = {
   },
 };
 
-module.exports = restaurantController;
+module.exports = restController;
