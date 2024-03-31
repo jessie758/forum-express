@@ -11,6 +11,11 @@ const authHandler = require('../middlewares/auth-handler');
 router.use('/admin', authHandler.authenticatedAdmin, admin);
 
 router.get(
+  '/restaurants/:id/dashboard',
+  authHandler.authenticated,
+  restController.getDashboard
+);
+router.get(
   '/restaurants/:id',
   authHandler.authenticated,
   restController.getRestaurant

@@ -50,7 +50,25 @@ const restController = {
 
       if (!restaurant) throw new Error(`Restaurant doesn't exist!`);
 
+      await restaurant.increment({ view_counts: 1 });
+
       return res.render('restaurant', { restaurant: restaurant.toJSON() });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  getDashboard: async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+      const restaurant = await Restaurant.findByPk(id, {
+        include: [Comment],
+        nest: true,
+      });
+
+      if (!restaurant) throw new Error(`Restaurant doesn't exist!`);
+
+      return res.render('dashboard', { restaurant: restaurant.toJSON() });
     } catch (error) {
       return next(error);
     }
