@@ -62,7 +62,7 @@ const restController = {
 
     try {
       const restaurant = await Restaurant.findByPk(id, {
-        include: [Comment],
+        include: [Category, Comment],
         nest: true,
       });
 
