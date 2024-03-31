@@ -1,0 +1,52 @@
+<div class='row p-3'>
+  {{! user profile }}
+  <div class='col-4'>
+    {{#if user.image}}
+      <img
+        class='img-responsive center-block'
+        src='{{user.image}}'
+        alt='user image'
+        style='width: 300px; transition: opacity 0.5s; opacity:0;'
+        onload='this.style.opacity=1;'
+      />
+    {{else}}
+      <img
+        class='img-responsive center-block'
+        src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+        alt='user image placeholder'
+        style='width: 300px; transition: opacity 0.5s; opacity:0;'
+        onload='this.style.opacity=1;'
+      />
+    {{/if}}
+  </div>
+  <div class='col-8'>
+    <h4 class='fw-bold'>{{user.name}}</h4>
+    <p>{{user.email}}</p>
+    <a class='btn btn-primary' href='/users/{{user.id}}/edit'>Edit</a>
+  </div>
+
+  {{! user comment statistics }}
+  <div class='card mt-5 p-0'>
+    <div class='card-header py-3'>
+      <div class='d-flex align-items-center'>
+        <div>{{commentedRestaurantNumber}} 已評論餐廳</div>
+        <div class='ms-4'>{{user.Comments.length}} 評論總數</div>
+      </div>
+    </div>
+    <div class='card-body py-3'>
+      <div class='d-flex align-items-center'>
+        {{#each user.Comments}}
+          <a href='/restaurants/{{this.Restaurant.id}}' class='ms-3'>
+            <img
+              class='img-responsive center-block'
+              src='{{this.Restaurant.image}}'
+              alt='user image'
+              style='width: 50px; height: 50px; transition: opacity 0.5s; opacity:0;'
+              onload='this.style.opacity=1;'
+            />
+          </a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

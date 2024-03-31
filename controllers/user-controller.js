@@ -1,6 +1,7 @@
+const { localFileHandler } = require('../helpers/file-helpers');
 const bcrypt = require('bcryptjs');
 const db = require('../models');
-const { User } = db;
+const { User, Comment, Restaurant } = db;
 
 const userController = {
   signUpPage: (req, res) => {
@@ -38,6 +39,67 @@ const userController = {
       if (err) return next(err);
     });
     return res.redirect('/signin');
+  },
+  getUser: async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+      const user = await User.findByPk(id, {
+        include: [{ model: Comment, include: [Restaurant] }],
+        nest: true,
+      });
+
+      if (!user) throw new Error(`User doesn't exist.`);
+
+      const rSet = new Set();
+      user.Comments?.forEach((comment) => rSet.add(comment.restaurantId));
+
+      return res.render('users/profile', {
+        user: user.toJSON(),
+        commentedRestaurantNumber: rSet.size,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  editUser: async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+      const user = await User.findByPk(id);
+
+      if (!user) throw new Error(`User doesn't exist.`);
+
+      return res.render('users/edit', { user: user.toJSON() });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  putUser: async (req, res, next) => {
+    const id = req.params.id;
+    const { name } = req.body;
+    const file = req.file;
+
+    if (!name) throw new Error(`User name is required.`);
+
+    try {
+      const [user, filePath] = await Promise.all([
+        User.findByPk(id),
+        localFileHandler(file),
+      ]);
+
+      if (!user) throw new Error(`User doesn't exist.`);
+
+      await user.update({
+        name,
+        image: filePath || null,
+      });
+
+      req.flash('success_messages', '使用者資料編輯成功');
+      return res.redirect(`/users/${id}`);
+    } catch (error) {
+      return next(error);
+    }
   },
 };
 
