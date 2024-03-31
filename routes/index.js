@@ -7,6 +7,7 @@ const restController = require('../controllers/restaurant-controller');
 const commentController = require('../controllers/comment-controller');
 const userController = require('../controllers/user-controller');
 const authHandler = require('../middlewares/auth-handler');
+const upload = require('../middlewares/multer');
 
 router.use('/admin', authHandler.authenticatedAdmin, admin);
 
@@ -35,6 +36,19 @@ router.delete(
   '/comments/:id',
   authHandler.authenticatedAdmin,
   commentController.deleteComment
+);
+
+router.get('/users/:id', authHandler.authenticated, userController.getUser);
+router.get(
+  '/users/:id/edit',
+  authHandler.authenticated,
+  userController.editUser
+);
+router.put(
+  '/users/:id',
+  authHandler.authenticated,
+  upload.single('image'),
+  userController.putUser
 );
 
 router.get('/signup', userController.signUpPage);

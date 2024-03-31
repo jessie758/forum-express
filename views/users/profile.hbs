@@ -1,0 +1,26 @@
+<div class='row p-3'>
+  <div class='col-4'>
+    {{#if user.image}}
+      <img
+        class='img-responsive center-block'
+        src='{{user.image}}'
+        alt='user image'
+        style='width: 280px; transition: opacity 0.5s; opacity:0;'
+        onload='this.style.opacity=1;'
+      />
+    {{else}}
+      <img
+        class='img-responsive center-block'
+        src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+        alt='user image placeholder'
+        style='width: 280px; transition: opacity 0.5s; opacity:0;'
+        onload='this.style.opacity=1;'
+      />
+    {{/if}}
+  </div>
+  <div class='col-8'>
+    <h4 class='fw-bold'>{{user.name}}</h4>
+    <p>{{user.email}}</p>
+    <a class='btn btn-primary' href='/users/{{user.id}}/edit'>Edit</a>
+  </div>
+</div>
