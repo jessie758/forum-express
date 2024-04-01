@@ -12,6 +12,11 @@ const upload = require('../middlewares/multer');
 router.use('/admin', authHandler.authenticatedAdmin, admin);
 
 router.get(
+  '/restaurants/feeds',
+  authHandler.authenticated,
+  restController.getFeeds
+);
+router.get(
   '/restaurants/:id/dashboard',
   authHandler.authenticated,
   restController.getDashboard
@@ -36,6 +41,28 @@ router.delete(
   '/comments/:id',
   authHandler.authenticatedAdmin,
   commentController.deleteComment
+);
+
+router.post(
+  '/favorites/:restaurantId',
+  authHandler.authenticated,
+  userController.addFavorite
+);
+router.delete(
+  '/favorites/:restaurantId',
+  authHandler.authenticated,
+  userController.removeFavorite
+);
+
+router.post(
+  '/like/:restaurantId',
+  authHandler.authenticated,
+  userController.addLike
+);
+router.delete(
+  '/like/:restaurantId',
+  authHandler.authenticated,
+  userController.removeLike
 );
 
 router.get('/users/:id', authHandler.authenticated, userController.getUser);

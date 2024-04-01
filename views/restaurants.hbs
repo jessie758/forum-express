@@ -1,7 +1,11 @@
-<h1>餐廳列表</h1>
+{{> restaurant-tabs route='index' }}
+
+<h1 class='fw-bold'>餐廳列表</h1>
+
+<hr />
 
 {{!-- category list --}}
-<ul class='nav nav-pills'>
+<ul class='nav nav-pills mt-5'>
   <li class='nav-item'>
     <a class='nav-link {{#if (isEqual categoryId '')}}active{{/if}}' href='?categoryId='>
       全部
@@ -45,6 +49,29 @@
           <p
             class='card-text text-truncate text-secondary mt-1'
           >{{this.description}}</p>
+        </div>
+        <hr class='m-0' />
+        <div class='d-flex justify-content-end gap-2 p-3'>
+          {{!-- favorite button --}}
+          {{#if this.isFavorited}}
+            <form action='/favorites/{{this.id}}?_method=DELETE' method='POST'>
+              <button type='submit' class='btn btn-outline-danger'>移除最愛</button>
+            </form>
+          {{else}}
+            <form action='/favorites/{{this.id}}' method='POST'>
+              <button type='submit' class='btn btn-outline-secondary'>加到最愛</button>
+            </form>
+          {{/if}}
+          {{!-- like button --}}
+          {{#if this.isLiked}}
+            <form action='/like/{{this.id}}?_method=DELETE' method='POST'>
+              <button type='submit' class='btn btn-outline-danger'>Unlike</button>
+            </form>
+          {{else}}
+            <form action='/like/{{this.id}}' method='POST'>
+              <button type='submit' class='btn btn-outline-secondary'>Like</button>
+            </form>
+          {{/if}}
         </div>
       </div>
     </div>

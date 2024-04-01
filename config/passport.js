@@ -1,8 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcryptjs');
-const db = require('../models');
-const User = db.User;
+const { User, Restaurant } = require('../models');
 
 passport.use(
   new LocalStrategy(
@@ -46,9 +45,21 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  let user = await User.findByPk(id);
-  user = user.toJSON();
-  return done(null, user);
+  try {
+    let user = await User.findByPk(id, {
+      attributes: ['id', 'name', 'email', 'isAdmin'],
+      include: [
+        // as 的名稱需與 model 的定義一致
+        { model: Restaurant, as: 'FavoritedRestaurants' },
+        { model: Restaurant, as: 'LikedRestaurants' },
+      ],
+    });
+
+    user = user.toJSON();
+    return done(null, user);
+  } catch (error) {
+    return done(error);
+  }
 });
 
 module.exports = passport;
