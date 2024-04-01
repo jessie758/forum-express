@@ -73,6 +73,44 @@ const restController = {
       return next(error);
     }
   },
+  getFeeds: async (req, res, next) => {
+    try {
+      let [restaurants, comments] = await Promise.all([
+        Restaurant.findAll({
+          include: [Category],
+          order: [['created_at', 'DESC']],
+          limit: 10,
+          nest: true,
+          raw: true,
+        }),
+        Comment.findAll({
+          include: [Restaurant, User],
+          order: [['created_at', 'DESC']],
+          limit: 10,
+          nest: true,
+          raw: true,
+        }),
+      ]);
+
+      restaurants = restaurants.map((rest) => ({
+        ...rest,
+        description: `${rest.description.substring(0, 200)}${
+          rest.description.length > 200 ? '...' : ''
+        }`,
+      }));
+
+      comments = comments.map((comment) => ({
+        ...comment,
+        text: `${comment.text.substring(0, 150)}${
+          comment.text.length > 150 ? '...' : ''
+        }`,
+      }));
+
+      return res.render('feeds', { restaurants, comments });
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = restController;

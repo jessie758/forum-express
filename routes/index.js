@@ -12,6 +12,11 @@ const upload = require('../middlewares/multer');
 router.use('/admin', authHandler.authenticatedAdmin, admin);
 
 router.get(
+  '/restaurants/feeds',
+  authHandler.authenticated,
+  restController.getFeeds
+);
+router.get(
   '/restaurants/:id/dashboard',
   authHandler.authenticated,
   restController.getDashboard
