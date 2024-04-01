@@ -50,6 +50,18 @@
             class='card-text text-truncate text-secondary mt-1'
           >{{this.description}}</p>
         </div>
+        <hr class='m-0' />
+        <div class='d-flex justify-content-end p-3'>
+          {{#if this.isFavorited}}
+            <form action='/favorites/{{this.id}}?_method=DELETE' method='POST'>
+              <button type='submit' class='btn btn-outline-danger ms-2'>移除最愛</button>
+            </form>
+          {{else}}
+            <form action='/favorites/{{this.id}}' method='POST'>
+              <button type='submit' class='btn btn-outline-secondary'>加到最愛</button>
+            </form>
+          {{/if}}
+        </div>
       </div>
     </div>
   {{/each}}

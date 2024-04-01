@@ -43,6 +43,17 @@ router.delete(
   commentController.deleteComment
 );
 
+router.post(
+  '/favorites/:restaurantId',
+  authHandler.authenticated,
+  userController.addFavorite
+);
+router.delete(
+  '/favorites/:restaurantId',
+  authHandler.authenticated,
+  userController.removeFavorite
+);
+
 router.get('/users/:id', authHandler.authenticated, userController.getUser);
 router.get(
   '/users/:id/edit',

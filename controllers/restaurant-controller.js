@@ -1,5 +1,6 @@
 const { Restaurant, Category, Comment, User } = require('../models');
 const { getOffset, getPagination } = require('../helpers/pagination-helper');
+const { getUser } = require('../helpers/auth-helpers');
 
 const restController = {
   getRestaurants: async (req, res, next) => {
@@ -24,9 +25,14 @@ const restController = {
         Category.findAll({ raw: true }),
       ]);
 
+      const favoritedRestaurantIds = getUser(req)?.FavoritedRestaurants?.map(
+        (fr) => fr.id
+      );
+
       const restaurants = restaurantData.rows.map((restaurant) => ({
         ...restaurant,
         description: restaurant.description.substring(0, 50),
+        isFavorited: favoritedRestaurantIds?.includes(restaurant.id),
       }));
 
       return res.render('restaurants', {
@@ -52,7 +58,14 @@ const restController = {
 
       await restaurant.increment({ view_counts: 1 });
 
-      return res.render('restaurant', { restaurant: restaurant.toJSON() });
+      const isFavorited = getUser(req)?.FavoritedRestaurants?.some(
+        (fr) => fr.id === restaurant.id
+      );
+
+      return res.render('restaurant', {
+        restaurant: restaurant.toJSON(),
+        isFavorited,
+      });
     } catch (error) {
       return next(error);
     }
