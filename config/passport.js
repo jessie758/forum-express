@@ -47,10 +47,14 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     let user = await User.findByPk(id, {
-      // as 的名稱需與 model 的定義一致
-      include: [{ model: Restaurant, as: 'FavoritedRestaurants' }],
+      attributes: ['id', 'name', 'email', 'isAdmin'],
+      include: [
+        // as 的名稱需與 model 的定義一致
+        { model: Restaurant, as: 'FavoritedRestaurants' },
+        { model: Restaurant, as: 'LikedRestaurants' },
+      ],
     });
-    
+
     user = user.toJSON();
     return done(null, user);
   } catch (error) {

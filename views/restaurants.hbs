@@ -51,14 +51,25 @@
           >{{this.description}}</p>
         </div>
         <hr class='m-0' />
-        <div class='d-flex justify-content-end p-3'>
+        <div class='d-flex justify-content-end gap-2 p-3'>
+          {{!-- favorite button --}}
           {{#if this.isFavorited}}
             <form action='/favorites/{{this.id}}?_method=DELETE' method='POST'>
-              <button type='submit' class='btn btn-outline-danger ms-2'>移除最愛</button>
+              <button type='submit' class='btn btn-outline-danger'>移除最愛</button>
             </form>
           {{else}}
             <form action='/favorites/{{this.id}}' method='POST'>
               <button type='submit' class='btn btn-outline-secondary'>加到最愛</button>
+            </form>
+          {{/if}}
+          {{!-- like button --}}
+          {{#if this.isLiked}}
+            <form action='/like/{{this.id}}?_method=DELETE' method='POST'>
+              <button type='submit' class='btn btn-outline-danger'>Unlike</button>
+            </form>
+          {{else}}
+            <form action='/like/{{this.id}}' method='POST'>
+              <button type='submit' class='btn btn-outline-secondary'>Like</button>
             </form>
           {{/if}}
         </div>

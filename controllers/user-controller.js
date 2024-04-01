@@ -1,7 +1,7 @@
 const { localFileHandler } = require('../helpers/file-helpers');
 const bcrypt = require('bcryptjs');
 const db = require('../models');
-const { User, Comment, Restaurant, Favorite } = db;
+const { User, Comment, Restaurant, Favorite, Like } = db;
 const { getUser } = require('../helpers/auth-helpers');
 
 const userController = {
@@ -139,6 +139,48 @@ const userController = {
       await favorite.destroy();
 
       req.flash('success_messages', 'Successfully unfavorite the restaurant.');
+      return res.redirect('back');
+    } catch (error) {
+      return next(error);
+    }
+  },
+  addLike: async (req, res, next) => {
+    const userId = getUser(req).id;
+    const restaurantId = req.params.restaurantId;
+
+    try {
+      const [like, user, restaurant] = await Promise.all([
+        Like.findOne({ where: { userId, restaurantId } }),
+        User.findByPk(userId),
+        Restaurant.findByPk(restaurantId),
+      ]);
+
+      if (like) throw new Error('You have liked this restaurant.');
+      // if (!user) throw new Error(`User doesn't exist.`);
+      if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
+
+      await Like.create({ userId, restaurantId });
+
+      req.flash('success_messages', 'Successfully like the restaurant.');
+      return res.redirect('back');
+    } catch (error) {
+      return next(error);
+    }
+  },
+  removeLike: async (req, res, next) => {
+    const userId = getUser(req).id;
+    const { restaurantId } = req.params;
+
+    try {
+      const like = await Like.findOne({
+        where: { userId, restaurantId },
+      });
+
+      if (!like) throw new Error(`You haven't liked this restaurant.`);
+
+      await like.destroy();
+
+      req.flash('success_messages', 'Successfully unlike the restaurant.');
       return res.redirect('back');
     } catch (error) {
       return next(error);

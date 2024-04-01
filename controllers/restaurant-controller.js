@@ -29,10 +29,15 @@ const restController = {
         (fr) => fr.id
       );
 
+      const likedRestaurantIds = getUser(req)?.LikedRestaurants?.map(
+        (lr) => lr.id
+      );
+
       const restaurants = restaurantData.rows.map((restaurant) => ({
         ...restaurant,
         description: restaurant.description.substring(0, 50),
         isFavorited: favoritedRestaurantIds?.includes(restaurant.id),
+        isLiked: likedRestaurantIds?.includes(restaurant.id),
       }));
 
       return res.render('restaurants', {
@@ -62,9 +67,14 @@ const restController = {
         (fr) => fr.id === restaurant.id
       );
 
+      const isLiked = getUser(req)?.LikedRestaurants?.some(
+        (lr) => lr.id === restaurant.id
+      );
+
       return res.render('restaurant', {
         restaurant: restaurant.toJSON(),
         isFavorited,
+        isLiked,
       });
     } catch (error) {
       return next(error);

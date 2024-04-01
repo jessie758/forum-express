@@ -54,6 +54,17 @@ router.delete(
   userController.removeFavorite
 );
 
+router.post(
+  '/like/:restaurantId',
+  authHandler.authenticated,
+  userController.addLike
+);
+router.delete(
+  '/like/:restaurantId',
+  authHandler.authenticated,
+  userController.removeLike
+);
+
 router.get('/users/:id', authHandler.authenticated, userController.getUser);
 router.get(
   '/users/:id/edit',
