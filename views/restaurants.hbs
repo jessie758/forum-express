@@ -1,7 +1,11 @@
-<h1>餐廳列表</h1>
+{{> restaurant-tabs route='index' }}
+
+<h1 class='fw-bold'>餐廳列表</h1>
+
+<hr />
 
 {{!-- category list --}}
-<ul class='nav nav-pills'>
+<ul class='nav nav-pills mt-5'>
   <li class='nav-item'>
     <a class='nav-link {{#if (isEqual categoryId '')}}active{{/if}}' href='?categoryId='>
       全部
