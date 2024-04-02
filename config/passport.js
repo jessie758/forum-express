@@ -52,6 +52,8 @@ passport.deserializeUser(async (id, done) => {
         // as 的名稱需與 model 的定義一致
         { model: Restaurant, as: 'FavoritedRestaurants' },
         { model: Restaurant, as: 'LikedRestaurants' },
+        { model: User, as: 'Followings' },
+        { model: User, as: 'Followers' },
       ],
     });
 
