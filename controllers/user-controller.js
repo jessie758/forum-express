@@ -9,12 +9,16 @@ const userController = {
     return res.render('signup');
   },
   signUp: async (req, res, next) => {
-    try {
-      const { name, email, password, passwordCheck } = req.body;
+    const { name, email, password, passwordCheck } = req.body;
 
+    try {
       if (password !== passwordCheck)
         throw new Error('Passwords do not match.');
+    } catch (error) {
+      return next(error);
+    }
 
+    try {
       const user = await User.findOne({ where: { email } });
       if (user) throw new Error('Email already exists.');
 
@@ -52,12 +56,14 @@ const userController = {
 
       if (!user) throw new Error(`User doesn't exist.`);
 
-      const rSet = new Set();
-      user.Comments?.forEach((comment) => rSet.add(comment.restaurantId));
+      const commentedRestaurantIdSet = new Set();
+      user.Comments?.forEach((comment) =>
+        commentedRestaurantIdSet.add(comment.restaurantId)
+      );
 
       return res.render('users/profile', {
         user: user.toJSON(),
-        commentedRestaurantNumber: rSet.size,
+        commentedRestaurantNumber: commentedRestaurantIdSet.size,
       });
     } catch (error) {
       return next(error);
@@ -77,15 +83,25 @@ const userController = {
     }
   },
   putUser: async (req, res, next) => {
-    const id = req.params.id;
+    const reqUserId = getUser(req).id;
+    const userId = req.params.id;
     const { name } = req.body;
     const file = req.file;
 
-    if (!name) throw new Error(`User name is required.`);
+    try {
+      // 確認是使用者本人修改 Profile
+      if (Number(reqUserId) !== Number(userId))
+        throw new Error(`You don't have authority to edit this user's profile`);
+
+      // 確認有輸入新的使用者名稱
+      if (!name) throw new Error(`User name is required.`);
+    } catch (error) {
+      return next(error);
+    }
 
     try {
       const [user, filePath] = await Promise.all([
-        User.findByPk(id),
+        User.findByPk(userId),
         localFileHandler(file),
       ]);
 
@@ -97,7 +113,7 @@ const userController = {
       });
 
       req.flash('success_messages', '使用者資料編輯成功');
-      return res.redirect(`/users/${id}`);
+      return res.redirect(`/users/${userId}`);
     } catch (error) {
       return next(error);
     }
