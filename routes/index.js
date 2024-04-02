@@ -65,12 +65,24 @@ router.delete(
   userController.removeLike
 );
 
-router.get('/users/:id', authHandler.authenticated, userController.getUser);
+router.post(
+  '/following/:userId',
+  authHandler.authenticated,
+  userController.addFollowing
+);
+router.delete(
+  '/following/:userId',
+  authHandler.authenticated,
+  userController.removeFollowing
+);
+
+router.get('/users/top', authHandler.authenticated, userController.getTopUsers);
 router.get(
   '/users/:id/edit',
   authHandler.authenticated,
   userController.editUser
 );
+router.get('/users/:id', authHandler.authenticated, userController.getUser);
 router.put(
   '/users/:id',
   authHandler.authenticated,
