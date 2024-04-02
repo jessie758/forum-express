@@ -149,7 +149,7 @@ const userController = {
       ]);
 
       if (favorite) throw new Error('You have favorited this restaurant.');
-      if (!user) throw new Error(`User doesn't exist.`);
+      // if (!user) throw new Error(`User doesn't exist.`);
       if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
 
       await Favorite.create({ userId, restaurantId });
