@@ -80,6 +80,32 @@ const restController = {
       return next(error);
     }
   },
+  getTopRestaurants: async (req, res, next) => {
+    try {
+      const restaurantData = await Restaurant.findAll({
+        include: [{ model: User, as: 'FavoritedUsers' }],
+      });
+
+      const restaurants = restaurantData
+        .map((restaurant) => ({
+          ...restaurant.toJSON(),
+          description: restaurant.description.substring(0, 50),
+          favoritedCount: restaurant.FavoritedUsers?.length || 0,
+          isFavorited: getUser(req)?.FavoritedRestaurants?.some(
+            (fr) => fr.id === restaurant.id
+          ),
+        }))
+        .sort(
+          (restaurantA, restaurantB) =>
+            restaurantB.favoritedCount - restaurantA.favoritedCount
+        )
+        .slice(0, 10);
+
+      return res.render('top-restaurants', { restaurants });
+    } catch (error) {
+      return next(error);
+    }
+  },
   getDashboard: async (req, res, next) => {
     const id = req.params.id;
 

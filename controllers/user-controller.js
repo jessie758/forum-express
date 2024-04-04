@@ -1,7 +1,7 @@
 const { localFileHandler } = require('../helpers/file-helpers');
 const bcrypt = require('bcryptjs');
 const db = require('../models');
-const { User, Comment, Restaurant, Favorite, Like } = db;
+const { User, Comment, Restaurant, Favorite, Like, Followship } = db;
 const { getUser } = require('../helpers/auth-helpers');
 
 const userController = {
@@ -9,12 +9,16 @@ const userController = {
     return res.render('signup');
   },
   signUp: async (req, res, next) => {
-    try {
-      const { name, email, password, passwordCheck } = req.body;
+    const { name, email, password, passwordCheck } = req.body;
 
+    try {
       if (password !== passwordCheck)
         throw new Error('Passwords do not match.');
+    } catch (error) {
+      return next(error);
+    }
 
+    try {
       const user = await User.findOne({ where: { email } });
       if (user) throw new Error('Email already exists.');
 
@@ -52,13 +56,34 @@ const userController = {
 
       if (!user) throw new Error(`User doesn't exist.`);
 
-      const rSet = new Set();
-      user.Comments?.forEach((comment) => rSet.add(comment.restaurantId));
+      const commentedRestaurantIdSet = new Set();
+      user.Comments?.forEach((comment) =>
+        commentedRestaurantIdSet.add(comment.restaurantId)
+      );
 
       return res.render('users/profile', {
         user: user.toJSON(),
-        commentedRestaurantNumber: rSet.size,
+        commentedRestaurantNumber: commentedRestaurantIdSet.size,
       });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  getTopUsers: async (req, res, next) => {
+    try {
+      const usersData = await User.findAll({
+        include: [{ model: User, as: 'Followers' }],
+      });
+
+      const users = usersData
+        .map((user) => ({
+          ...user.toJSON(),
+          followerCount: user.Followers?.length || 0,
+          isFollowed: getUser(req)?.Followings?.some((f) => f.id === user.id),
+        }))
+        .sort((userA, userB) => userB.followerCount - userA.followerCount);
+
+      return res.render('top-users', { users });
     } catch (error) {
       return next(error);
     }
@@ -77,15 +102,25 @@ const userController = {
     }
   },
   putUser: async (req, res, next) => {
-    const id = req.params.id;
+    const reqUserId = getUser(req).id;
+    const userId = req.params.id;
     const { name } = req.body;
     const file = req.file;
 
-    if (!name) throw new Error(`User name is required.`);
+    try {
+      // 確認是使用者本人修改 Profile
+      if (Number(reqUserId) !== Number(userId))
+        throw new Error(`You don't have authority to edit this user's profile`);
+
+      // 確認有輸入新的使用者名稱
+      if (!name) throw new Error(`User name is required.`);
+    } catch (error) {
+      return next(error);
+    }
 
     try {
       const [user, filePath] = await Promise.all([
-        User.findByPk(id),
+        User.findByPk(userId),
         localFileHandler(file),
       ]);
 
@@ -97,7 +132,7 @@ const userController = {
       });
 
       req.flash('success_messages', '使用者資料編輯成功');
-      return res.redirect(`/users/${id}`);
+      return res.redirect(`/users/${userId}`);
     } catch (error) {
       return next(error);
     }
@@ -114,7 +149,7 @@ const userController = {
       ]);
 
       if (favorite) throw new Error('You have favorited this restaurant.');
-      if (!user) throw new Error(`User doesn't exist.`);
+      // if (!user) throw new Error(`User doesn't exist.`);
       if (!restaurant) throw new Error(`Restaurant doesn't exist.`);
 
       await Favorite.create({ userId, restaurantId });
@@ -181,6 +216,55 @@ const userController = {
       await like.destroy();
 
       req.flash('success_messages', 'Successfully unlike the restaurant.');
+      return res.redirect('back');
+    } catch (error) {
+      return next(error);
+    }
+  },
+  addFollowing: async (req, res, next) => {
+    const followerId = getUser(req).id;
+    const { userId: followingId } = req.params;
+
+    try {
+      if (Number(followerId) === Number(followingId))
+        throw new Error(`You can't follow yourself.`);
+    } catch (error) {
+      return next(error);
+    }
+
+    try {
+      const [followship, follower, following] = await Promise.all([
+        Followship.findOne({ where: { followerId, followingId } }),
+        User.findByPk(followerId),
+        User.findByPk(followingId),
+      ]);
+
+      if (followship) throw new Error('You have followed this user.');
+      if (!follower) throw new Error(`Follower user doesn't exist.`);
+      if (!following) throw new Error(`Following user doesn't exist.`);
+
+      await Followship.create({ followerId, followingId });
+
+      req.flash('success_messages', 'Successfully follow the user.');
+      return res.redirect('back');
+    } catch (error) {
+      return next(error);
+    }
+  },
+  removeFollowing: async (req, res, next) => {
+    const followerId = getUser(req).id;
+    const { userId: followingId } = req.params;
+
+    try {
+      const followship = await Followship.findOne({
+        where: { followerId, followingId },
+      });
+
+      if (!followship) throw new Error(`You haven't followed this user.`);
+
+      await followship.destroy();
+
+      req.flash('success_messages', 'Successfully unfollow the user.');
       return res.redirect('back');
     } catch (error) {
       return next(error);

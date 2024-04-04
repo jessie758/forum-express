@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      // 使用者&評論 一對多關聯
       User.hasMany(models.Comment, { foreignKey: 'userId' });
+      // 使用者&餐廳 多對多關聯
       User.belongsToMany(models.Restaurant, {
         through: models.Favorite,
         foreignKey: 'userId',
@@ -20,6 +22,17 @@ module.exports = (sequelize, DataTypes) => {
         through: models.Like,
         foreignKey: 'userId',
         as: 'LikedRestaurants',
+      });
+      // 使用者&使用者 多對多關聯
+      User.belongsToMany(User, {
+        through: models.Followship,
+        foreignKey: 'followerId',
+        as: 'Followings',
+      });
+      User.belongsToMany(User, {
+        through: models.Followship,
+        foreignKey: 'followingId',
+        as: 'Followers',
       });
     }
   }
