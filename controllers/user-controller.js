@@ -50,7 +50,24 @@ const userController = {
 
     try {
       const user = await User.findByPk(id, {
-        include: [{ model: Comment, include: [Restaurant] }],
+        include: [
+          {
+            model: User,
+            as: 'Followings',
+            attributes: ['id', 'image'],
+          },
+          {
+            model: User,
+            as: 'Followers',
+            attributes: ['id', 'image'],
+          },
+          { model: Comment, include: [Restaurant] },
+          {
+            model: Restaurant,
+            as: 'FavoritedRestaurants',
+            attributes: ['id', 'image'],
+          },
+        ],
         nest: true,
       });
 
